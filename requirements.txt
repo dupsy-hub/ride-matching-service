@@ -9,7 +9,6 @@ alembic==1.13.0
 
 # Redis
 redis==5.0.1
-aioredis==2.0.1
 
 # Pydantic for data validation
 pydantic==2.5.0

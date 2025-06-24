@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     app_name: str = "Ride Matching Service"
     debug: bool = False
     port: int = 8002
+    log_level: str = "INFO"
     
     # Database
     database_url: str = "postgresql+asyncpg://rideshare:password@localhost:5432/rideshare_db"
