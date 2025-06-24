@@ -1,53 +1,9 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
+# Python
+**pycache**/
 *.py[cod]
 *$py.class
-
-# Virtual environment
-venv/
-env/
-.venv/
-.env/
-
-# Environment variables
-.env
-.env.*
-
-# macOS
-.DS_Store
-
-# Editor settings
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# Pycharm
-*.iml
-*.ipr
-*.iws
-*.pyc
-*.pyo
-
-# Test reports
-htmlcov/
-.coverage
-coverage.xml
-*.cover
-.hypothesis/
-
-# Logs
-*.log
-
-# MyPy and Pyright
-.mypy_cache/
-.pyright/
-
-# FastAPI auto-generated docs (if exported)
-docs/swagger.json
-docs/redoc.html
-
-# Python build artifacts
+*.so
+.Python
 build/
 develop-eggs/
 dist/
@@ -59,24 +15,87 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 
-# Pipenv / poetry
-Pipfile.lock
-poetry.lock
+# Virtual Environment
+venv/
+env/
+ENV/
+env
+.env
+.env.*
+!.env.example
+.venv
+.python-version
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+.vs/
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+*.log
+logs/
+log/
+
+# Database
+*.db
+*.sqlite3
+*.sqlite
+
+# OS specific
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+*.temp
+
+# Project specific
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Alembic
+versions/*
+!versions/.keep
 
 # Docker
-*.pid
-*.pid.lock
+.docker/
+docker-compose.override.yml
 
-# VSCode devcontainer
-.devcontainer/
+# Misc
+*.bak
+*.swp
+*.swo
+*~
+.env.local
+.env.*.local
 
-# SQLite
-*.sqlite3
+# Compiled Python artifacts
+__pycache__/
+*.pyc
+*.pyo
 
-# Gunicorn log or pid files
-gunicorn.pid
-gunicorn.log
+# Build and distribution
+dist/
+build/
+*.egg-info/
+
+# Sensitive configuration
+*.secret
