@@ -1,0 +1,82 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+
+# Environment variables
+.env
+.env.*
+
+# macOS
+.DS_Store
+
+# Editor settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Pycharm
+*.iml
+*.ipr
+*.iws
+*.pyc
+*.pyo
+
+# Test reports
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+.hypothesis/
+
+# Logs
+*.log
+
+# MyPy and Pyright
+.mypy_cache/
+.pyright/
+
+# FastAPI auto-generated docs (if exported)
+docs/swagger.json
+docs/redoc.html
+
+# Python build artifacts
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Pipenv / poetry
+Pipfile.lock
+poetry.lock
+
+# Docker
+*.pid
+*.pid.lock
+
+# VSCode devcontainer
+.devcontainer/
+
+# SQLite
+*.sqlite3
+
+# Gunicorn log or pid files
+gunicorn.pid
+gunicorn.log
