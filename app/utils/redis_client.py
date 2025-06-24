@@ -1,4 +1,4 @@
-import aioredis
+import redis.asyncio as redis
 import json
 import logging
 from typing import Optional, Any, Dict
@@ -9,13 +9,13 @@ logger = logging.getLogger(__name__)
 
 class RedisClient:
     def __init__(self):
-        self.redis: Optional[aioredis.Redis] = None
-        self.pubsub: Optional[aioredis.client.PubSub] = None
+        self.redis: Optional[redis.Redis] = None
+        self.pubsub: Optional[redis.client.PubSub] = None
 
     async def connect(self):
         """Connect to Redis"""
         try:
-            self.redis = aioredis.from_url(
+            self.redis = redis.from_url(
                 settings.redis_url,
                 encoding="utf-8",
                 decode_responses=True,

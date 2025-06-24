@@ -20,7 +20,7 @@ class RideStatusUpdateRequest(BaseModel):
 
 class RideCancelRequest(BaseModel):
     reason: str = Field(..., min_length=5, max_length=500)
-    cancelled_by: str = Field(..., regex="^(rider|driver)$")
+    cancelled_by: str = Field(..., pattern="^(rider|driver)$")  # Fixed: pattern instead of regex
 
 
 # Response schemas

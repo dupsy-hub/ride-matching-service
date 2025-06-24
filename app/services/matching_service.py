@@ -9,6 +9,7 @@ from .ride_service import RideService
 from .event_service import EventService
 from ..models.ride import RideStatus
 from ..schemas.ride import RideStatusUpdateRequest
+from ..schemas.driver import DriverAvailabilityUpdateRequest  # Add this import
 from ..config import settings
 
 logger = logging.getLogger(__name__)
@@ -108,10 +109,10 @@ class MatchingService:
             )
             
             if success:
-                # Mark driver as unavailable
+                # Mark driver as unavailable - Fixed to use schema object
                 await self.driver_service.update_driver_availability(
                     driver_id,
-                    {"is_available": False},
+                    DriverAvailabilityUpdateRequest(is_available=False),
                     db
                 )
                 
@@ -210,10 +211,10 @@ class MatchingService:
                 # Driver declined - find another driver
                 logger.info(f"Driver {driver_id} declined ride {ride_id}")
                 
-                # Mark driver as available again
+                # Mark driver as available again - Fixed to use schema object
                 await self.driver_service.update_driver_availability(
                     driver_id,
-                    {"is_available": True},
+                    DriverAvailabilityUpdateRequest(is_available=True),
                     db
                 )
                 
