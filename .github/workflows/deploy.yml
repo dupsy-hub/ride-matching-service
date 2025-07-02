@@ -1,0 +1,51 @@
+name: Deploy Microservice to AKS
+
+on:
+  push:
+    branches:
+      - '**'   # Trigger on all branches
+  pull_request:
+  workflow_dispatch:
+
+env:
+  ACR_NAME: teleiostejiriacr                    
+  AKS_RESOURCE_GROUP: teleios-tejiri-rg
+  AKS_CLUSTER_NAME: rideshare-aks
+  CONTAINER_NAME: ride-matching-service       
+  IMAGE_TAG: ${{ github.sha }}
+  DEPLOYMENT_NAME: ride-matching-deployment
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: ACR Login
+      run: az acr login --name $ACR_NAME
+
+    - name: Set AKS context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: ${{ env.AKS_RESOURCE_GROUP }}
+        cluster-name: ${{ env.AKS_CLUSTER_NAME }}
+
+    - name: Build Docker Image
+      run: |
+        docker build -t $ACR_NAME.azurecr.io/$CONTAINER_NAME:$IMAGE_TAG .
+
+    - name: Push Image to ACR
+      run: |
+        docker push $ACR_NAME.azurecr.io/$CONTAINER_NAME:$IMAGE_TAG
+
+    - name: Deploy to AKS
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release')
+      run: |
+        kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$ACR_NAME.azurecr.io/$CONTAINER_NAME:$IMAGE_TAG -n microservices
