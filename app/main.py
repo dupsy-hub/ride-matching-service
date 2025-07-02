@@ -68,7 +68,8 @@ app = FastAPI(
     description="Microservice for handling ride requests and driver matching",
     version="1.0.0",
     debug=settings.debug,
-    lifespan=lifespan
+    lifespan=lifespan,
+    root_path="/api/rides"
 )
 
 # Add CORS middleware
