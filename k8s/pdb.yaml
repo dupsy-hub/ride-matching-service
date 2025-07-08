@@ -2,9 +2,9 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: ride-matching-pdb
-  namespace: microservices
+  namespace: rideshare
 spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app: ride-matching
+      app: ride-matching-service
