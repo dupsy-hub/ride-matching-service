@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout Code
+      - name: 📅 Checkout Code
         uses: actions/checkout@v4
 
       - name: 🔐 Azure Login
@@ -46,7 +46,7 @@ jobs:
             ${{ env.ACR_URL }}/${{ env.CONTAINER_NAME }}:${{ env.IMAGE_TAG }}
             ${{ env.ACR_URL }}/${{ env.CONTAINER_NAME }}:latest
 
-      - name: ☸️ Set AKS Context
+      - name: ☘️ Set AKS Context
         uses: azure/aks-set-context@v3
         with:
           resource-group: ${{ env.AKS_RESOURCE_GROUP }}
@@ -54,14 +54,14 @@ jobs:
 
       - name: 🔐 Create or Update Kubernetes Secret
         run: |
-          kubectl create secret generic user-service-secrets \
+          kubectl create secret generic ride-matching-service-secrets \
             --from-literal=DATABASE_URL="${{ secrets.DATABASE_URL }}" \
             --from-literal=REDIS_URL="${{ secrets.REDIS_URL }}" \
             --from-literal=JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
             --namespace=$NAMESPACE \
             --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: 🧩 Apply Deployment Manifest
+      - name: 🧹 Apply Deployment Manifest
         run: kubectl apply -f k8s/deployment.yaml -n $NAMESPACE
 
       - name: 📡 Apply Service Manifest
