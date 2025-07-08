@@ -1,51 +1,79 @@
-name: Deploy Microservice to AKS
+name: Deploy Ride Matching Service to AKS
 
 on:
   push:
     branches:
-      - '**'   # Trigger on all branches
+      - "**"
   pull_request:
   workflow_dispatch:
 
 env:
-  ACR_NAME: teleiostejiriacr                    
-  AKS_RESOURCE_GROUP: teleios-tejiri-rg
-  AKS_CLUSTER_NAME: rideshare-aks
-  CONTAINER_NAME: ride-matching-service       
+  ACR_NAME: teleiosdupeacr01
+  ACR_URL: teleiosdupeacr01.azurecr.io
+  AKS_RESOURCE_GROUP: teleios-dupe-rg
+  AKS_CLUSTER_NAME: rideshare-aks-cluster
+  CONTAINER_NAME: ride-matching-service
+  DEPLOYMENT_NAME: ride-matching-service
+  NAMESPACE: rideshare
   IMAGE_TAG: ${{ github.sha }}
-  DEPLOYMENT_NAME: ride-matching-deployment
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 🔐 Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: ACR Login
-      run: az acr login --name $ACR_NAME
+      - name: 🔑 ACR Login
+        run: az acr login --name $ACR_NAME
 
-    - name: Set AKS context
-      uses: azure/aks-set-context@v3
-      with:
-        resource-group: ${{ env.AKS_RESOURCE_GROUP }}
-        cluster-name: ${{ env.AKS_CLUSTER_NAME }}
+      - name: 🔧 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Build Docker Image
-      run: |
-        docker build -t $ACR_NAME.azurecr.io/$CONTAINER_NAME:$IMAGE_TAG .
+      - name: 🛠️ Build & Push Multi-Arch Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64/v8
+          tags: |
+            ${{ env.ACR_URL }}/${{ env.CONTAINER_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ env.ACR_URL }}/${{ env.CONTAINER_NAME }}:latest
 
-    - name: Push Image to ACR
-      run: |
-        docker push $ACR_NAME.azurecr.io/$CONTAINER_NAME:$IMAGE_TAG
+      - name: ☸️ Set AKS Context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ env.AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ env.AKS_CLUSTER_NAME }}
 
-    - name: Deploy to AKS
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release')
-      run: |
-        kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$ACR_NAME.azurecr.io/$CONTAINER_NAME:$IMAGE_TAG -n microservices
+      - name: 🔐 Create or Update Kubernetes Secret
+        run: |
+          kubectl create secret generic user-service-secrets \
+            --from-literal=DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            --from-literal=REDIS_URL="${{ secrets.REDIS_URL }}" \
+            --from-literal=JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
+            --namespace=$NAMESPACE \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: 🧩 Apply Deployment Manifest
+        run: kubectl apply -f k8s/deployment.yaml -n $NAMESPACE
+
+      - name: 📡 Apply Service Manifest
+        run: kubectl apply -f k8s/service.yaml -n $NAMESPACE
+
+      - name: 📈 Apply HPA Manifest
+        run: kubectl apply -f k8s/hpa.yaml -n $NAMESPACE
+
+      - name: 🛡️ Apply PDB Manifest
+        run: kubectl apply -f k8s/pdb.yaml -n $NAMESPACE
+
+      - name: 🚢 Update Image in Deployment
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release')
+        run: |
+          kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$ACR_URL/$CONTAINER_NAME:$IMAGE_TAG -n $NAMESPACE
