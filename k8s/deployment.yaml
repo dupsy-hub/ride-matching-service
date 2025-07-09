@@ -4,6 +4,12 @@ metadata:
   name: ride-matching-service
   namespace: rideshare
 spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: ride-matching
@@ -14,12 +20,12 @@ spec:
     spec:
       containers:
         - name: ride-matching-service
-          image: teleiosdupeacr01.azurecr.io/user-service:v1.0
+          image: teleiosdupeacr01.azurecr.io/ride-matching-service:v1.0
           ports:
             - containerPort: 8002
           envFrom:
             - secretRef:
-                name: ride-matching-secrets
+                name: ride-matching-service-secrets
           resources:
             requests:
               memory: "150Mi"
